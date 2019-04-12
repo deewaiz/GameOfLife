@@ -16,21 +16,21 @@ cell_size = 16
 screen_width  = grid_size_x * (cell_size + 1) + 1
 screen_height = grid_size_y * (cell_size + 1) + 1
 print("x = ", screen_width, " y = ", screen_height)
-window = pyglet.window.Window(screen_width, screen_height)
+window = pyglet.window.Window(screen_width, screen_height + 1)
+print("x = ", window.width, " y = ", window.height)
 
-image = pyglet.resource.image('square-64.png')
-image.anchor_x = image.width / 2
-image.anchor_y = image.height / 2
-
-#def generate_grid():
+# Генерируем игровое поле
+def generate_grid():
+    for x in range(1, window.width + 1, cell_size + 1):
+        pyglet.graphics.draw(2, pyglet.gl.GL_LINES, ("v2i", (x, 1, x, window.height)))
+    for y in range(1, window.height + 1, cell_size + 1):
+        pyglet.graphics.draw(2, pyglet.gl.GL_LINES, ("v2i", (1, y, window.width, y)))
 
 
 
 @window.event
 def on_draw():
     window.clear()
-    #image.blit(window.width / 2, window.height / 2)
-    image.blit(200, 0)
-
+    generate_grid()
 
 pyglet.app.run()
