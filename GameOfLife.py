@@ -55,7 +55,7 @@ def random_fill_grid(chance): # 0 < chance < 100
         for j in range(grid_size_y):
             if random.random() * 100 <= chance:
                 first_gen_arr[i].append(True)
-                second_gen_arr[i].append(False)
+                second_gen_arr[i].append(True)
                 place_cell(i, j)
             else:
                 first_gen_arr[i].append(False)
@@ -119,6 +119,12 @@ def place_glider(x, y):
     first_gen_arr[x + 2][y + 1] = True
     first_gen_arr[x + 1][y + 2] = True
 
+    second_gen_arr[x    ][y    ] = True
+    second_gen_arr[x + 1][y    ] = True
+    second_gen_arr[x + 2][y    ] = True
+    second_gen_arr[x + 2][y + 1] = True
+    second_gen_arr[x + 1][y + 2] = True
+
     place_cell(x    , y    )
     place_cell(x + 1, y    )
     place_cell(x + 2, y    )
@@ -142,21 +148,19 @@ def on_draw():
 
     # Запуск основного цикла программы
     else:
-        # Отрисовка генерации клеток
         for i in range(grid_size_x):
             for j in range(grid_size_y):
+
+                # Отображаем живые клетки
                 if first_gen_arr[i][j] == True:
                     place_cell(i, j)
 
-    # Основная логика
-    for i in range(grid_size_x):
-        for j in range(grid_size_y):
+                # Логика игры
+                if first_gen_arr[i][j] == False and neighbours_count(i, j) == 3:
+                    second_gen_arr[i][j] = True
 
-            if first_gen_arr[i][j] == False and neighbours_count(i, j) == 3:
-                second_gen_arr[i][j] = True
-
-            if first_gen_arr[i][j] == True and (neighbours_count(i, j) < 2 or neighbours_count(i, j) > 3):
-                second_gen_arr[i][j] = False
+                if first_gen_arr[i][j] == True and (neighbours_count(i, j) < 2 or neighbours_count(i, j) > 3):
+                    second_gen_arr[i][j] = False
 
     # Заносим изменения в первый массив
     first_gen_arr = copy.deepcopy(second_gen_arr)
