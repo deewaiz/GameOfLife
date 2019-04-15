@@ -1,8 +1,13 @@
 import pyglet
 import random
+import copy
+from pyglet import clock
 pyglet.resource.path = ['/Users/deewaiz/Downloads']
 pyglet.resource.reindex()
 
+fps_display = pyglet.clock.ClockDisplay()
+
+# Статус игры
 isStarted = False
 
 # Задаем размерность поля
@@ -15,9 +20,7 @@ cell_size = 16
 # Определяем и задаем размер окна
 screen_width  = grid_size_x * (cell_size + 1) + 1
 screen_height = grid_size_y * (cell_size + 1) + 1
-print("x = ", screen_width, " y = ", screen_height)
 window = pyglet.window.Window(screen_width, screen_height)
-print("x = ", window.width, " y = ", window.height)
 
 # Задаем массивы генераций клеток
 first_gen_arr = []
@@ -69,20 +72,6 @@ def empty_fill_grid():
             first_gen_arr[i].append(False)
             second_gen_arr[i].append(False)
 
-# Функция расположения глайдера
-def place_glider():
-    first_gen_arr[30][20] = True
-    first_gen_arr[31][20] = True
-    first_gen_arr[32][20] = True
-    first_gen_arr[32][21] = True
-    first_gen_arr[31][22] = True
-
-    place_cell(30, 20)
-    place_cell(31, 20)
-    place_cell(32, 20)
-    place_cell(32, 21)
-    place_cell(31, 22)
-
 # Функция реализации бесконечности игрового поля по оси X
 def infinity_x(x):
     if x > grid_size_x - 1:
@@ -126,30 +115,46 @@ def neighbours_count(i, j):
     print("neighbours_count(i, j) ended")
     return neighbours_count
 
+# Функция расположения глайдера
+def place_glider(x, y):
+    first_gen_arr[infinity_x(x + 0)][infinity_y(y + 0)] = True
+    first_gen_arr[infinity_x(x + 1)][infinity_y(y + 0)] = True
+    first_gen_arr[infinity_x(x + 2)][infinity_y(y + 0)] = True
+    first_gen_arr[infinity_x(x + 2)][infinity_y(y + 1)] = True
+    first_gen_arr[infinity_x(x + 1)][infinity_y(y + 2)] = True
 
+    place_cell(infinity_x(x + 0), infinity_y(y + 0))
+    place_cell(infinity_x(x + 1), infinity_y(y + 0))
+    place_cell(infinity_x(x + 2), infinity_y(y + 0))
+    place_cell(infinity_x(x + 2), infinity_y(y + 1))
+    place_cell(infinity_x(x + 1), infinity_y(y + 2))
 
-fps_display = pyglet.clock.ClockDisplay()
 
 @window.event
 def on_draw():
-    global isStarted
-    #test = isStarted
+    global isStarted, first_gen_arr, second_gen_arr
     window.clear()
+    fps_display.draw()
+
     generate_grid()
+    # Инициализация игры
     if isStarted == False:
-        random_fill_grid(20)
-        #empty_fill_grid()
-        #place_glider()
+        #random_fill_grid(20)
+        empty_fill_grid()
+        place_glider(int(grid_size_x / 2), int(grid_size_y / 2))
         isStarted = True
+
+    # Запуск основного цикла программы
     else:
+        # Отрисовка генерации клеток
         for i in range(grid_size_x):
             for j in range(grid_size_y):
                 if first_gen_arr[i][j] == True:
                     place_cell(i, j)
 
+    # Основная логика
     for i in range(grid_size_x):
         for j in range(grid_size_y):
-
 
             if first_gen_arr[i][j] == False and neighbours_count(i, j) == 3:
                 second_gen_arr[i][j] = True
@@ -163,14 +168,9 @@ def on_draw():
                 second_gen_arr[i][j] = False
                 print("Клетка умерла")
 
+    # Заносим изменения в первый массив
+    first_gen_arr = copy.deepcopy(second_gen_arr)
 
-    for i in range(grid_size_x):
-        for j in range(grid_size_y):
-            first_gen_arr[i][j] = second_gen_arr[i][j]
-    #first_gen_arr = second_gen_arr
-    #place_cell(grid_size_x - 1, grid_size_y - 1)
-    #window.clear()
-    #print(first_gen_arr[grid_size_x - 1][grid_size_y - 1])
 
 
 
