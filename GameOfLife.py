@@ -1,10 +1,8 @@
 import pyglet
 import random
 import copy
-from pyglet import clock
-pyglet.resource.path = ['/Users/deewaiz/Downloads']
-pyglet.resource.reindex()
 
+# Таймер дисплея
 fps_display = pyglet.clock.ClockDisplay()
 
 # Статус игры
@@ -95,40 +93,37 @@ def infinity_y(y):
 # Функция считающая соседей
 def neighbours_count(i, j):
     neighbours_count = 0
-    print("neighbours_count(i, j) started")
     if first_gen_arr[infinity_x(i - 1)][infinity_y(j - 1)] == True:
         neighbours_count += 1
-    if first_gen_arr[infinity_x(i - 1)][infinity_y(j)] == True:
+    if first_gen_arr[infinity_x(i - 1)][infinity_y(j    )] == True:
         neighbours_count += 1
     if first_gen_arr[infinity_x(i - 1)][infinity_y(j + 1)] == True:
         neighbours_count += 1
-    if first_gen_arr[infinity_x(i)][infinity_y(j - 1)] == True:
+    if first_gen_arr[infinity_x(i    )][infinity_y(j - 1)] == True:
         neighbours_count += 1
-    if first_gen_arr[infinity_x(i)][infinity_y(j + 1)] == True:
+    if first_gen_arr[infinity_x(i    )][infinity_y(j + 1)] == True:
         neighbours_count += 1
     if first_gen_arr[infinity_x(i + 1)][infinity_y(j - 1)] == True:
         neighbours_count += 1
-    if first_gen_arr[infinity_x(i + 1)][infinity_y(j)] == True:
+    if first_gen_arr[infinity_x(i + 1)][infinity_y(j    )] == True:
         neighbours_count += 1
     if first_gen_arr[infinity_x(i + 1)][infinity_y(j + 1)] == True:
         neighbours_count += 1
-    print("neighbours_count(i, j) ended")
     return neighbours_count
 
 # Функция расположения глайдера
 def place_glider(x, y):
-    first_gen_arr[infinity_x(x + 0)][infinity_y(y + 0)] = True
-    first_gen_arr[infinity_x(x + 1)][infinity_y(y + 0)] = True
-    first_gen_arr[infinity_x(x + 2)][infinity_y(y + 0)] = True
-    first_gen_arr[infinity_x(x + 2)][infinity_y(y + 1)] = True
-    first_gen_arr[infinity_x(x + 1)][infinity_y(y + 2)] = True
+    first_gen_arr[x    ][y    ] = True
+    first_gen_arr[x + 1][y    ] = True
+    first_gen_arr[x + 2][y    ] = True
+    first_gen_arr[x + 2][y + 1] = True
+    first_gen_arr[x + 1][y + 2] = True
 
-    place_cell(infinity_x(x + 0), infinity_y(y + 0))
-    place_cell(infinity_x(x + 1), infinity_y(y + 0))
-    place_cell(infinity_x(x + 2), infinity_y(y + 0))
-    place_cell(infinity_x(x + 2), infinity_y(y + 1))
-    place_cell(infinity_x(x + 1), infinity_y(y + 2))
-
+    place_cell(x    , y    )
+    place_cell(x + 1, y    )
+    place_cell(x + 2, y    )
+    place_cell(x + 2, y + 1)
+    place_cell(x + 1, y + 2)
 
 @window.event
 def on_draw():
@@ -137,11 +132,12 @@ def on_draw():
     fps_display.draw()
 
     generate_grid()
+
     # Инициализация игры
     if isStarted == False:
-        #random_fill_grid(20)
-        empty_fill_grid()
-        place_glider(int(grid_size_x / 2), int(grid_size_y / 2))
+        random_fill_grid(20)
+        #empty_fill_grid()
+        #place_glider(int(grid_size_x / 2), int(grid_size_y / 2))
         isStarted = True
 
     # Запуск основного цикла программы
@@ -158,21 +154,11 @@ def on_draw():
 
             if first_gen_arr[i][j] == False and neighbours_count(i, j) == 3:
                 second_gen_arr[i][j] = True
-                print("Зарождение новой клетки")
 
-            if first_gen_arr[i][j] == True and (neighbours_count(i, j) == 2 or neighbours_count(i, j) == 3):
-                second_gen_arr[i][j] = True
-                print("Клетка продолжает жить")
-
-            elif first_gen_arr[i][j] == True and (neighbours_count(i, j) < 2 or neighbours_count(i, j) > 3):
+            if first_gen_arr[i][j] == True and (neighbours_count(i, j) < 2 or neighbours_count(i, j) > 3):
                 second_gen_arr[i][j] = False
-                print("Клетка умерла")
 
     # Заносим изменения в первый массив
     first_gen_arr = copy.deepcopy(second_gen_arr)
-
-
-
-
 
 pyglet.app.run()
